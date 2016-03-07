@@ -9,7 +9,7 @@ void WINAPI OutputDebugStringEx(LPCTSTR lpcFormatText, ...)
 
     va_list argptr;
     va_start(argptr, lpcFormatText);
-    vsprintf(szBuffer, lpcFormatText, argptr);
+    wvsprintf(szBuffer, lpcFormatText, argptr);
     va_end(argptr);
 
 	OutputDebugString(szBuffer);
@@ -68,13 +68,15 @@ static const char* strstri(const char* str,const char* subStr)
     return NULL;
 }
 
-//获取文件类型
-//0 无类型默认
-//1 *.c *.cpp *.cxx *.cs
-//2 *.h *.hpp *.hxx *.inc
-//3 *.txt *.text *.doc
-//4 *.php *.php3 *.htm *.js
-//5 *.pas *.vb *.pb *.vbs
+/**
+	获取文件类型
+	0 无类型默认
+	1 *.c *.cpp *.cxx *.cs
+	2 *.h *.hpp *.hxx *.inc
+	3 *.txt *.text *.doc
+	4 *.php *.php3 *.htm *.js
+	5 *.pas *.vb *.pb *.vbs
+	*/
 int GetColorIndex(const char* filename)
 {
 	const char *p = NULL;
@@ -97,10 +99,10 @@ int GetColorIndex(const char* filename)
 		return 2;
 	p = strstri(filename,".hpp");
 	if(p != NULL)
-		return 2;
+		return 2;	
 	p = strstri(filename,".hxx");
 	if(p != NULL)
-		return 2;
+		return 2;	
 	p = strstri(filename,".inc");
 	if(p != NULL)
 		return 2;

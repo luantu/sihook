@@ -35,8 +35,9 @@ static LRESULT CALLBACK MdiClientSubClass(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			{
 				last_windowpos.cx = pos->cx;
 				last_windowpos.cy = pos->cy;
-				pos->y += SiTabCtl_GetHeight();
+				//pos->y += SiTabCtl_GetHeight();
 				pos->cy -= SiTabCtl_GetHeight();
+				pos->cy -= 1; //为了好看
 				lParam = (LPARAM)pos;
 			}
 		}

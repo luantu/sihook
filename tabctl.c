@@ -3,6 +3,10 @@
 #define _WIN32_IE 0x0500
 #endif
 
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0501
+#endif // _WIN32_WINNT
+
 #include "const.h"
 #include "utils.h"
 #include "tabctl.h"
@@ -12,7 +16,7 @@ static WNDPROC old_tab_ctl_proc = NULL;
 static int last_row_count = 1;
 static COLORREF color_table[10] =
 {
-	RGB(255,255,255),	//default
+	RGB(169,169,169),	//default
 	RGB(204,182,238),	//c
 	RGB(210,227,178),	//h
 	RGB(219,236,249),	//txt
@@ -43,13 +47,18 @@ static LRESULT CALLBACK TabCtlSubClass(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 
 void SiTabCtl_Create(HWND parent)
 {
-	hwnd_tab_ctl = CreateWindowEx(0,WC_TABCONTROL,"",
-								WS_CHILD|WS_VISIBLE|TCS_BUTTONS|TCS_FLATBUTTONS|TCS_BOTTOM|TCS_MULTILINE|TCS_RAGGEDRIGHT|TCS_SCROLLOPPOSITE|TCS_FOCUSNEVER|TCS_OWNERDRAWFIXED,
+    INITCOMMONCONTROLSEX ctl_ex;
+    ctl_ex.dwSize = sizeof(ctl_ex);
+    ctl_ex.dwICC = ICC_TAB_CLASSES;
+    InitCommonControlsEx(&ctl_ex);
+
+	hwnd_tab_ctl = CreateWindowEx(WS_EX_STATICEDGE,WC_TABCONTROL,"",
+								WS_CHILD|WS_VISIBLE|TCS_OWNERDRAWFIXED,
 								0,0,0,SI_TAB_HEIGHT,parent,NULL,NULL,NULL);
-								
-	HFONT font = CreateFont(16,0,0,0,FW_NORMAL,FALSE,FALSE,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,DEFAULT_PITCH | FF_SWISS,"Courier New");
+
+	HFONT font = CreateFont(18,0,0,0,FW_NORMAL,FALSE,FALSE,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,DEFAULT_PITCH | FF_SWISS,"Consolas");
 	SendMessage(hwnd_tab_ctl,WM_SETFONT,(WPARAM)font,MAKELPARAM(1,0));
-							
+
 	SiTabCtl_AddCloseItem();
 	last_row_count = 1;
 	old_tab_ctl_proc = (WNDPROC)GetWindowLong(hwnd_tab_ctl,GWL_WNDPROC);
@@ -194,9 +203,10 @@ void SiTabCtl_OnPosChanging(WINDOWPOS* pos)
 	if(!(pos->flags & SWP_NOSIZE))
 	{
 		int row;
-		SetWindowPos(hwnd_tab_ctl,NULL,pos->x,pos->y,pos->cx,SI_TAB_HEIGHT,pos->flags);
+		//SetWindowPos(hwnd_tab_ctl,NULL,pos->x,pos->y,pos->cx,SI_TAB_HEIGHT,pos->flags); SWP_NOMOVE
 		row = SiTabCtl_GetRowCount();
-		SetWindowPos(hwnd_tab_ctl,NULL,0,0,pos->cx,SI_TAB_HEIGHT*row,SWP_NOMOVE);
+		SetWindowPos(hwnd_tab_ctl,NULL,pos->x,
+            pos->y+pos->cy-(SI_TAB_HEIGHT*row),pos->cx,SI_TAB_HEIGHT*row,pos->flags);
 	}
 }
 
@@ -241,7 +251,7 @@ void SiTabCtl_OnLButtonClk(void)
 	if(count == 0)
 		return;
 
-	rtv = MessageBox(hwnd_tab_ctl,"是否关闭所有标签?","sitab plugin by Red_angelX",MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);
+	rtv = MessageBox(hwnd_tab_ctl,"关闭所有文件?","Source Insight Plus",MB_OKCANCEL|MB_ICONQUESTION|MB_DEFBUTTON2);
 	if(rtv == IDCANCEL)
 		return;
 
@@ -278,7 +288,7 @@ void SiTabCtl_OnDrawItem(DRAWITEMSTRUCT* item)
 	hBrush = CreateSolidBrush(color_table[type]);
 	if(SiTabCtl_GetCurItem() == item->itemID)
 	{
-		hBrush = CreateSolidBrush(RGB(255,0,0));
+		hBrush = CreateSolidBrush(RGB(255,255,255));
 	}
     //SetTextColor(lpDrawItem->hDC, RGB(0, 0, 255));
     //FrameRect(item->hDC,&item->rcItem,hBrush);

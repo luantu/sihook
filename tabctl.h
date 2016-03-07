@@ -2,7 +2,7 @@
 #define __TABCTL__H__
 
 #include <windows.h>
-#include <commctrl.h>
+#include <Commctrl.h>
 #include <wingdi.h>
 
 //´´½¨TabCtl
